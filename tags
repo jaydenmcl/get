@@ -1,42 +1,41 @@
 local TextChatService = game:GetService("TextChatService")
- 
+
 -- Owner and Admin Usernames
-local OwnerUsernames = {"mrpizzaman987", "happymanslashsad"}
+local OwnerUsernames = {"Owner1", "Owner2"}
 local AdminUsernames = {"Admin1", "Admin2"}
- 
--- Tag Colors
-local OwnerColor1 = "rgb(255, 0, 0)"
-local OwnerColor2 = "rgb(0, 255, 0)"
-local AdminColor1 = "rgb(0, 0, 255)"
-local AdminColor2 = "rgb(255, 165, 0)"
- 
-TextChatService.OnIncomingMessage = function(Message)
-    local Player = game.Players:GetPlayerByUserId(Message.TextSource.UserId)
- 
-    if Player then
+
+-- Tag Colors (use hex codes)
+local OwnerColor1 = "#FF0000"
+local OwnerColor2 = "#00FF00"
+local AdminColor1 = "#0000FF"
+local AdminColor2 = "#FFA500"
+
+TextChatService.OnIncomingMessage = function(message)
+    local player = nil
+    if message.TextSource then
+        player = game.Players:GetPlayerByUserId(message.TextSource.UserId)
+    end
+
+    if player then
+        local props = Instance.new("TextChatMessageProperties")
+
         -- Owner Tags
-        if table.find(OwnerUsernames, Player.Name) then
-            if Player.Name == OwnerUsernames[1] then
-                local OwnerTag = "[Owner🛠️] "
-                local OwnerColoredTag = "<font color='" .. OwnerColor1 .. "'>" .. OwnerTag .. "</font>"
-                Message.PrefixText = OwnerColoredTag .. Message.PrefixText
-            elseif Player.Name == OwnerUsernames[2] then
-                local OwnerTag = "[Owner2🛠️] "
-                local OwnerColoredTag = "<font color='" .. OwnerColor2 .. "'>" .. OwnerTag .. "</font>"
-                Message.PrefixText = OwnerColoredTag .. Message.PrefixText
+        if table.find(OwnerUsernames, player.Name) then
+            if player.Name == OwnerUsernames[1] then
+                props.PrefixText = "<font color='" .. OwnerColor1 .. "'>[Owner1🛠️]</font> " .. message.PrefixText
+            elseif player.Name == OwnerUsernames[2] then
+                props.PrefixText = "<font color='" .. OwnerColor2 .. "'>[Owner2🛠️]</font> " .. message.PrefixText
             end
- 
+
         -- Admin Tags
-        elseif table.find(AdminUsernames, Player.Name) then
-            if Player.Name == AdminUsernames[1] then
-                local AdminTag = "[Co-Owner] "
-                local AdminColoredTag = "<font color='" .. AdminColor1 .. "'>" .. AdminTag .. "</font>"
-                Message.PrefixText = AdminColoredTag .. Message.PrefixText
-            elseif Player.Name == AdminUsernames[2] then
-                local AdminTag = "[Admin2🔥] "
-                local AdminColoredTag = "<font color='" .. AdminColor2 .. "'>" .. AdminTag .. "</font>"
-                Message.PrefixText = AdminColoredTag .. Message.PrefixText
+        elseif table.find(AdminUsernames, player.Name) then
+            if player.Name == AdminUsernames[1] then
+                props.PrefixText = "<font color='" .. AdminColor1 .. "'>[Admin1🔥]</font> " .. message.PrefixText
+            elseif player.Name == AdminUsernames[2] then
+                props.PrefixText = "<font color='" .. AdminColor2 .. "'>[Admin2🔥]</font> " .. message.PrefixText
             end
         end
+
+        return props
     end
 end
