@@ -1,41 +1,21 @@
-local TextChatService = game:GetService("TextChatService")
+local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
 
--- Owner and Admin Usernames
-local OwnerUsernames = {"Owner1", "Owner2"}
-local AdminUsernames = {"Admin1", "Admin2"}
+local GAMEPASS_ID = 12345678 -- replace with your gamepass ID
 
--- Tag Colors (use hex codes)
-local OwnerColor1 = "#FF0000"
-local OwnerColor2 = "#00FF00"
-local AdminColor1 = "#0000FF"
-local AdminColor2 = "#FFA500"
+Players.PlayerAdded:Connect(function(player)
+    -- Check if player owns the pass
+    local success, ownsPass = pcall(function()
+        return MarketplaceService:UserOwnsGamePassAsync(player.UserId, GAMEPASS_ID)
+    end)
 
-TextChatService.OnIncomingMessage = function(message)
-    local player = nil
-    if message.TextSource then
-        player = game.Players:GetPlayerByUserId(message.TextSource.UserId)
+    if success and ownsPass then
+        -- Get HD Admin and grant admin rank
+        local hdAdmin = game.ServerStorage:WaitForChild("HDAdmin")
+        local MainModule = require(hdAdmin.MainFramework)
+        MainModule:AddAdmin(player, "Admin") -- rank can be "Owner", "Admin", "Moderator"
+        print(player.Name .. " was given Admin via GamePass")
+    else
+        print(player.Name .. " does not own the Admin gamepass")
     end
-
-    if player then
-        local props = Instance.new("TextChatMessageProperties")
-
-        -- Owner Tags
-        if table.find(OwnerUsernames, player.Name) then
-            if player.Name == OwnerUsernames[1] then
-                props.PrefixText = "<font color='" .. OwnerColor1 .. "'>[Owner1🛠️]</font> " .. message.PrefixText
-            elseif player.Name == OwnerUsernames[2] then
-                props.PrefixText = "<font color='" .. OwnerColor2 .. "'>[Owner2🛠️]</font> " .. message.PrefixText
-            end
-
-        -- Admin Tags
-        elseif table.find(AdminUsernames, player.Name) then
-            if player.Name == AdminUsernames[1] then
-                props.PrefixText = "<font color='" .. AdminColor1 .. "'>[Admin1🔥]</font> " .. message.PrefixText
-            elseif player.Name == AdminUsernames[2] then
-                props.PrefixText = "<font color='" .. AdminColor2 .. "'>[Admin2🔥]</font> " .. message.PrefixText
-            end
-        end
-
-        return props
-    end
-end
+end)
